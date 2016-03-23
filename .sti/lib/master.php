@@ -711,6 +711,6 @@ return array(
   ),
   'plugin.license_key' => '',
   'plugin.type' => '',
-  'wordpress.home' => 'http://wordpress-wordpress.getup.io',
+  'wordpress.home' => '',
   'pgcache.bad_behavior_path' => '',
 );
