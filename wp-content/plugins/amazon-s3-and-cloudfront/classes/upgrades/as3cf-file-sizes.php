@@ -42,14 +42,14 @@ class AS3CF_Upgrade_File_Sizes extends AS3CF_Upgrade {
 	/**
 	 * Get the total file sizes for an attachment and associated files.
 	 *
-	 * @param $attachment
+	 * @param mixed $attachment
 	 *
 	 * @return bool
 	 */
-	function upgrade_attachment( $attachment ) {
+	protected function upgrade_item( $attachment ) {
 		$s3object = unserialize( $attachment->s3object );
 		if ( false === $s3object ) {
-			error_log( 'Failed to unserialize S3 meta for attachment ' . $attachment->ID . ': ' . $attachment->s3object );
+			AS3CF_Error::log( 'Failed to unserialize S3 meta for attachment ' . $attachment->ID . ': ' . $attachment->s3object );
 			$this->error_count++;
 
 			return false;
@@ -57,7 +57,7 @@ class AS3CF_Upgrade_File_Sizes extends AS3CF_Upgrade {
 
 		$region = $this->as3cf->get_s3object_region( $s3object );
 		if ( is_wp_error( $region ) ) {
-			error_log( 'Failed to get the region for the bucket of the attachment ' . $attachment->ID );
+			AS3CF_Error::log( 'Failed to get the region for the bucket of the attachment ' . $attachment->ID );
 			$this->error_count++;
 
 			return false;
@@ -81,7 +81,7 @@ class AS3CF_Upgrade_File_Sizes extends AS3CF_Upgrade {
 			// List objects for the attachment
 			$result = $s3client->ListObjects( $args );
 		} catch ( Exception $e ) {
-			error_log( 'Error listing objects of prefix ' . $search_prefix . ' for attachment ' . $attachment->ID . ' from S3: ' . $e->getMessage() );
+			AS3CF_Error::log( 'Error listing objects of prefix ' . $search_prefix . ' for attachment ' . $attachment->ID . ' from S3: ' . $e->getMessage() );
 			$this->error_count ++;
 
 			return false;
@@ -107,7 +107,7 @@ class AS3CF_Upgrade_File_Sizes extends AS3CF_Upgrade {
 		}
 
 		if ( 0 === $file_size_total ) {
-			error_log( 'Total file size for the attachment is 0: ' . $attachment->ID );
+			AS3CF_Error::log( 'Total file size for the attachment is 0: ' . $attachment->ID );
 			$this->error_count ++;
 
 			return false;
@@ -130,7 +130,7 @@ class AS3CF_Upgrade_File_Sizes extends AS3CF_Upgrade {
 	 *
 	 * @return int
 	 */
-	function count_attachments_to_process() {
+	protected function count_items_to_process() {
 		// get the table prefixes for all the blogs
 		$table_prefixes = $this->as3cf->get_all_blog_table_prefixes();
 		$all_count      = 0;
@@ -146,12 +146,13 @@ class AS3CF_Upgrade_File_Sizes extends AS3CF_Upgrade {
 	/**
 	 * Get all attachments that don't have region in their S3 meta data for a blog
 	 *
-	 * @param string $prefix
-	 * @param int    $limit
+	 * @param string     $prefix
+	 * @param int        $limit
+	 * @param bool|mixed $offset
 	 *
-	 * @return mixed
+	 * @return array
 	 */
-	function get_attachments_to_process( $prefix, $limit ) {
+	protected function get_items_to_process( $prefix, $limit, $offset = false ) {
 		$attachments = $this->get_attachments_removed_from_server( $prefix, false, $limit );
 
 		return $attachments;
@@ -166,7 +167,7 @@ class AS3CF_Upgrade_File_Sizes extends AS3CF_Upgrade {
 	 *
 	 * @return mixed
 	 */
-	function get_s3_attachments( $prefix, $limit = null ) {
+	protected function get_s3_attachments( $prefix, $limit = null ) {
 		global $wpdb;
 
 		$sql = "SELECT pm1.`post_id` as `ID`, pm1.`meta_value` AS 's3object'
@@ -195,7 +196,7 @@ class AS3CF_Upgrade_File_Sizes extends AS3CF_Upgrade {
 	 *
 	 * @return array|int
 	 */
-	function get_attachments_removed_from_server( $prefix, $count = false, $limit = null ) {
+	protected function get_attachments_removed_from_server( $prefix, $count = false, $limit = null ) {
 		$all_attachments = $this->get_s3_attachments( $prefix, $limit );
 		$attachments     = array();
 
