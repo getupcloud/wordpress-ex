@@ -33,7 +33,8 @@ define('DB_USER', getenv("DATABASE_USER"));
 define('DB_PASSWORD', getenv("DATABASE_PASSWORD"));
 
 /** MySQL hostname */
-define('DB_HOST', getenv(strtoupper(getenv("DATABASE_SERVICE_NAME"))."_SERVICE_HOST"). ':' . getenv(strtoupper(getenv("DATABASE_SERVICE_NAME"))."_SERVICE_PORT"));
+define('DATABASE_SERVICE_NAME', strtoupper(preg_replace("/[^a-zA-Z0-9_]/", "_", getenv("DATABASE_SERVICE_NAME"))));
+define('DB_HOST', getenv(DATABASE_SERVICE_NAME."_SERVICE_HOST"). ':' . getenv(DATABASE_SERVICE_NAME."_SERVICE_PORT"));
 
 /** Database Charset to use in creating database tables. */
 define('DB_CHARSET', 'utf8');
