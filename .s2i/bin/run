@@ -1,0 +1,13 @@
+#!/bin/bash
+
+#move wp-content to a volume to persist data
+if [ "$WITHVOLUME" = "yes" ]; then
+    rsync -azvh --ignore-existing wp-content /opt/app-root/src/data/
+    rm -rfv wp-content
+    ln -s /opt/app-root/src/data/wp-content wp-content
+fi
+
+chmod 400 wp-config.php
+chmod -R 775 data/wp-content
+
+source ${STI_SCRIPTS_PATH}/run
