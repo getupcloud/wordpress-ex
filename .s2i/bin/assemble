@@ -3,7 +3,7 @@
 if [ -e /usr/local/sti/assemble ]; then
   # old assemble location in previous php image versions
   source /usr/local/sti/assemble
-else 
+else
   source ${STI_SCRIPTS_PATH}/assemble
 fi
 
@@ -14,6 +14,6 @@ cp ./wp-content/plugins/w3-total-cache/wp-content/object-cache.php ./wp-content/
 
 mkdir -p ./wp-content/w3tc-config
 
-cp ./.sti/lib/master.php ./wp-content/w3tc-config/
+cp ./.s2i/lib/master.php ./wp-content/w3tc-config/
 
 chmod -R 777 ./wp-content/w3tc-config/

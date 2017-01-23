@@ -128,3 +128,6 @@ if ( !defined('ABSPATH') )
 
 /** Sets up WordPress vars and included files. */
 require_once(ABSPATH . 'wp-settings.php');
+
+/** Set wordpress to save everything on disk */
+define('FS_METHOD', getenv("FS_METHOD"));
